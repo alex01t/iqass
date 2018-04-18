@@ -1,3 +1,3 @@
-# iqass
+# IQ assignment
 
-hi
+Q: which positions were close by copmpanies in StP?
