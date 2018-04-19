@@ -1,13 +1,13 @@
 
 
 build:
-	docker build . -t tarasenkoas/iqass
+	docker build . -t tarasenkoas/iqass:build
 
-test: build
-	docker run tarasenkoas/iqass:latest python3 /iqass/test.py
+test:
+	python3 test.py
 
 run: build
-	docker run -it tarasenkoas/iqass:latest
+	docker run -it tarasenkoas/iqass:build
 
 deploy: build
 	docker push tarasenkoas/iqass
