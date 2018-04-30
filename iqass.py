@@ -1,35 +1,48 @@
+#!/usr/bin/python3.6
 from pprint import pprint as p
 import fetch
 import persist
+from EmployerBook import EmployerBook
+import logging
+import time
+
+logging.basicConfig(level=logging.DEBUG)
+
+def d(o):
+    import json
+    return json.dumps(o)
 
 def main():
-    for area in [52]:
-        for emp_type in ["company", "agency", "private_recruiter"]:
 
-            empf = lambda page, per: \
-                "https://api.hh.ru/employers?" + \
-                "&type=" + emp_type + \
-                "&only_with_vacancies=true" + \
-                "&area=" + str(area) + \
+    while True:
+
+        """
+            remember vacancies in Emp/vs/vac_id dict    a, to check which were removed
+            
+            no db -- no issue: will just output disappearing items 
+        
+        """
+
+
+        for emp in EmployerBook.get_priority_list():
+            emp_id = emp["id"]
+
+            vacf = lambda page, per: \
+                "https://api.hh.ru/vacancies?" + \
+                "&employer_id=" + str(emp_id) + \
                 "&page=" + str(page) + "&per_page=" + str(per)
 
-            for emp in fetch.crawl2(empf):
-                persist.employer(emp)
-                emp_id = emp["id"]
+            vs = list(fetch.crawl2(vacf))
 
-                vacf = lambda page, per: \
-                    "https://api.hh.ru/vacancies?" + \
-                    "&employer_id=" + str(emp_id) + \
-                    "&area=" + str(area) + \
-                    "&page=" + str(page) + "&per_page=" + str(per)
+            logging.info("got %s vacancies for employer %s", len(vs), emp_id)
+            persist.set_vacancies(vs)
 
-                vs = []
-                for vac in fetch.crawl2(vacf):
-                    vs.append(vac)
+        EmployerBook.update()
 
-                persist.vacancies(vs)
-                print("empl " + emp_id + " - " + str(len(vs)) + " vacancies")
+        logging.info("10s sleep...")
+        time.sleep(600)
 
 
 if __name__ == "__main__":
     main()
+

@@ -1,14 +1,28 @@
-from pprint import pprint as p
+import logging
+from typing import Generator, Callable
 
 """" crawler starts from this value as number of items per page when fetching """
 PER_PAGE_INIT = 2**6
 
 
+def employers(area: int) -> Generator[dict, None, None]:
+
+    for emp_type in ["company", "agency", "private_recruiter"]:
+
+        yield from crawl2(
+            lambda page, per:
+                "https://api.hh.ru/employers?" +
+                "&type=" + emp_type +
+                "&only_with_vacancies=true" +
+                "&area=" + str(area) +
+                "&page=" + str(page) + "&per_page=" + str(per)
+        )
+
+
 def get(url):
     import json
     js = json.loads(wget(url))
-    p(url)
-    # p(js)
+    logging.debug(url)
     if "items" in js:
         return js["items"]
     else:
@@ -19,14 +33,16 @@ def get(url):
 GETF = get
 
 
+Url = str
 """ crawl2 receives some function which returns an url based on $page & $per arguments, 
     yields items """
-def crawl2(urlf):
+def crawl2(urlf: Callable[[int, int], Url]):
     def per_page():
         n = PER_PAGE_INIT
         while n > 0:
             yield n
             n = n // 2
+
     def pages(n):
         while True:
             yield n
@@ -42,12 +58,12 @@ def crawl2(urlf):
                 if len(items) < per:
                     return
             except IndexError:
-                print("failed!")
+                logging.debug("failed!")
                 break
 
 
 def wget(url):
-    import urllib.request, http
+    import urllib.request, urllib.error, http
     headers = {'User-Agent': 'api-test-agent',}
     req = urllib.request.Request(url, data=None, headers=headers)
 
