@@ -73,3 +73,23 @@ def get_vacancy_ids():
 
     except Exception as e:
         logging.warning(e)
+
+
+def get_vacancy_events():
+    q = """
+        select 
+            v.eid,
+            e.js->>'name' as ename,
+            v.id, 
+            v.ts, 
+            case when v.closed_by is not null then 'closed' else 'new' end as event,
+            v.js->>'name' as name
+        from vacancy v, employer e
+        where e.id = v.eid 
+        order by ts desc limit 420"""
+    try:
+        c = conn.cursor()
+        c.execute(q)
+        yield from c.fetchall()
+    except Exception as e:
+        logging.warning(e)

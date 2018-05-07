@@ -44,6 +44,6 @@ class VacancyBook:
         logging.info("loaded %s vacancies for %s employers", c, len(VacancyBook._dict))
 
     @staticmethod
-    def get_closed():
-        pass
+    def get_feed():
+        return persist.get_vacancy_events()
 
