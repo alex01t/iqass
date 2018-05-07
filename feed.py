@@ -20,8 +20,7 @@ def main():
 
     s += "</table>"
 
-    with open("index.html", "w") as f:
-        f.write(s)
+    print(s)
 
 if __name__ == "__main__":
     main()
