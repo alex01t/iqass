@@ -7,10 +7,10 @@ test:
 	python3 test.py
 
 install:
-    ./install.sh
+	./install.sh
 
 run: build
-	docker run -it tarasenkoas/iqass:build
+	docker run -it --link iqass-db:postgres tarasenkoas/iqass:build
 
 deploy: build
 	docker push tarasenkoas/iqass
