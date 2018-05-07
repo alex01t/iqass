@@ -82,6 +82,7 @@ def get_vacancy_events():
             e.js->>'name' as ename,
             v.id, 
             v.ts, 
+            (v.js->>'published_at')::timestamp,
             case when v.closed_by is not null then 'closed' else 'new' end as event,
             v.js->>'name' as name
         from vacancy v, employer e
