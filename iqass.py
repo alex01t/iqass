@@ -7,7 +7,7 @@ from VacancyBook import VacancyBook
 import logging
 import time
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 def main():
 
