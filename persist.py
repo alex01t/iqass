@@ -56,7 +56,7 @@ def closed_vacancies(ids: [id]):
         c = conn.cursor()
         for vid in ids:
             c.execute(
-                "update vacancy set closed_by = now() where id = %s", (vid,)
+                "update vacancy set closed_by = now(), ts = now() where id = %s", (vid,)
             )
         conn.commit()
     except KeyboardInterrupt as e:
