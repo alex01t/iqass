@@ -4,13 +4,21 @@ from datetime import timedelta
 
 def main():
     s = """
+        <html><head>
+        <meta charset="UTF-8">
         <style>
             .closed {color: #c00}
             .new {color: #060}
-        </style>
+        </style></head>
     """
     s += "<table>"
-    s += "<tr><td>event time</td><td>event</td><td>empl</td><td>published at</td><td>vacancy</td></tr>"
+    s += """<tr>
+                <td>event time</td>
+                <td>event</td>
+                <td>empl</td>
+                <td>published at</td>
+                <td>vacancy</td>
+            </tr>"""
     for eid, ename, id, ts, published_at, event, name in VacancyBook.get_feed():
         s += "<tr class={0}>".format(event)
         s += "<td>{:%Y-%m-%d %H:%M}</td>".format(ts + timedelta(hours=3))

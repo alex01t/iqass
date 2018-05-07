@@ -87,7 +87,7 @@ def get_vacancy_events():
             v.js->>'name' as name
         from vacancy v, employer e
         where e.id = v.eid 
-        order by ts desc limit 420"""
+        order by ts desc limit 1024"""
     try:
         c = conn.cursor()
         c.execute(q)
