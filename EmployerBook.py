@@ -2,6 +2,7 @@ from pprint import pprint as p
 from typing import Callable, List, Generator, Dict
 import fetch, persist
 import logging
+from random import shuffle
 
 Area = int
 Employer = dict
@@ -26,48 +27,38 @@ class EmployerBook:
 
     @staticmethod
     def load():
-        logging.info("loading employers...")
         for area in EmployerBook.areas:
             emps = persist.get_employers(area)
             EmployerBook._dict.update(emps)
+        logging.info("loaded %s employers", len(EmployerBook._dict))
 
     @staticmethod
     def get_priority_list() -> List[Employer]:
         def priority(e: Employer) -> bool:
             return int(e["id"]) in [42, 1876072, 1304, 86622]
 
-        if not EmployerBook._dict:
-            EmployerBook.load()
-
-        return sorted(list(EmployerBook._dict.values()), key=priority, reverse=True)
+        es = list(EmployerBook._dict.values())
+        shuffle(es)
+        return sorted(es, key=priority, reverse=True)
 
     @staticmethod
     def update():
-
-        if not EmployerBook._dict:
-            EmployerBook.load()
-
         for area in EmployerBook.areas:
-            fresh_list = []
-            for e in EmployerBook._data_source(area):
-                fresh_list.append(e)
+            fresh_list = EmployerBook._data_source(area)
 
-            fresh_dict = dict(map(lambda e: (e["id"], e), fresh_list))
+            fresh_dict = dict(map(lambda e: (int(e["id"]), e), fresh_list))
 
             olds = EmployerBook._dict
 
-            changed = []
-            for k,new in fresh_dict.items():
-                old = olds.get(k)
-                if not old \
-                        or old.get("name") != new.get("name") \
-                        or old.get("open_vacancies") != new.get("open_vacancies"):
-
-                    changed.append(new)
+            new = []
+            for k,v in fresh_dict.items():
+                if k not in olds:
+                    new.append(v)
 
             EmployerBook._dict.update(fresh_dict)
 
-            persist.set_employers(changed, area)
+            logging.info("saving %s employers for area %s", len(new), area)
+            persist.new_employers(new, area)
 
     @staticmethod
     def clean():

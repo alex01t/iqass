@@ -7,57 +7,69 @@ try:
     conn = psycopg2.connect(connect_str)
 except Exception as e:
     logging.warning(e)
-    pass
+
+
+def get_closed_vacancies():
+    return []
 
 
 def get_employers(area):
-    logging.info("reading employers for area " + str(area) + "...")
     emps = dict()
     try:
         c = conn.cursor()
-        c.execute("""
-            select e.js
-            from employer e,
-            (select id, max(ts) ts from employer where area = %s group by id) m
-            where e.area = %s and e.id = m.id and e.ts = m.ts
-        """, (area,area,))
+        c.execute("select e.id, e.js from employer e where area = %s", (area,))
         for row in c.fetchall():
-            d = row[0]
-            emps[d["id"]] = d
+            emps[row[0]] = row[1]
 
     except Exception as e:
         logging.warning(e)
 
-    logging.info("got " + str(len(emps)) + " emplolyers")
     return emps
 
 
-def set_employers(emps, area):
-    logging.info("saving " + str(len(emps)) + " employers for area " + str(area))
+def new_employers(emps, area):
     try:
         c = conn.cursor()
         for e in emps:
-            c.execute("insert into employer values(%s, %s, %s, %s, now(), %s)",
-                           (e["id"], area, e["name"], e["open_vacancies"], json.dumps(e)))
-
+            c.execute("insert into employer values(%s, %s, %s, now(), %s)",
+                           (e["id"], area, e["name"], json.dumps(e)))
         conn.commit()
     except Exception as e:
         logging.warning(e)
 
-    logging.info("saved")
 
-
-
-def set_vacancies(vs):
+def new_vacancies(vs):
     try:
         c = conn.cursor()
         for v in vs:
             c.execute(
-                "insert into vacancy values(%s, now(), %s)",
-                (v["id"], json.dumps(v),)
+                "insert into vacancy values(%s, %s, null, now(), %s)",
+                (v["id"], v["employer"]["id"], json.dumps(v),)
             )
-
         conn.commit()
     except Exception as e:
         logging.warning(e)
 
+
+def closed_vacancies(ids: [id]):
+    try:
+        c = conn.cursor()
+        for vid in ids:
+            c.execute(
+                "update vacancy set closed_by = now() where id = %s", (vid,)
+            )
+        conn.commit()
+    except KeyboardInterrupt as e:
+        logging.warning(e)
+
+
+def get_vacancy_ids():
+    try:
+        c = conn.cursor()
+        c.execute(
+            "select eid, id from vacancy where closed_by is null"
+        )
+        yield from c.fetchall()
+
+    except Exception as e:
+        logging.warning(e)

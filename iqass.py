@@ -3,10 +3,11 @@ from pprint import pprint as p
 import fetch
 import persist
 from EmployerBook import EmployerBook
+from VacancyBook import VacancyBook
 import logging
 import time
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 def d(o):
     import json
@@ -14,34 +15,33 @@ def d(o):
 
 def main():
 
-    while True:
+    EmployerBook.load()
+    VacancyBook.load()
 
-        """
-            remember vacancies in Emp/vs/vac_id dict    a, to check which were removed
-            
-            no db -- no issue: will just output disappearing items 
-        
-        """
+    try:
+        while True:
+
+            # EmployerBook.update()
+
+            for emp in EmployerBook.get_priority_list():
+                emp_id = int(emp["id"])
+
+                vacf = lambda page, per: \
+                    "https://api.hh.ru/vacancies?" + \
+                    "&employer_id=" + str(emp_id) + \
+                    "&page=" + str(page) + "&per_page=" + str(per)
+
+                vs = list(fetch.crawl2(vacf))
+                logging.debug("got %s vacancies for employer %s", len(vs), emp_id)
+                VacancyBook.update(emp_id, vs)
 
 
-        for emp in EmployerBook.get_priority_list():
-            emp_id = emp["id"]
+            break
+            logging.info("10s sleep...")
+            time.sleep(10)
 
-            vacf = lambda page, per: \
-                "https://api.hh.ru/vacancies?" + \
-                "&employer_id=" + str(emp_id) + \
-                "&page=" + str(page) + "&per_page=" + str(per)
-
-            vs = list(fetch.crawl2(vacf))
-
-            logging.info("got %s vacancies for employer %s", len(vs), emp_id)
-            persist.set_vacancies(vs)
-
-        EmployerBook.update()
-
-        logging.info("10s sleep...")
-        time.sleep(600)
-
+    except KeyboardInterrupt:
+        pass
 
 if __name__ == "__main__":
     main()
