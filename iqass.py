@@ -21,7 +21,7 @@ def main():
     try:
         while True:
 
-            # EmployerBook.update()
+            EmployerBook.update()
 
             for emp in EmployerBook.get_priority_list():
                 emp_id = int(emp["id"])
@@ -35,13 +35,12 @@ def main():
                 logging.debug("got %s vacancies for employer %s", len(vs), emp_id)
                 VacancyBook.update(emp_id, vs)
 
-
-            break
-            logging.info("10s sleep...")
-            time.sleep(10)
+            logging.info("done here. sleep()")
+            time.sleep(60)
 
     except KeyboardInterrupt:
         pass
+
 
 if __name__ == "__main__":
     main()
