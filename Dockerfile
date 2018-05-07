@@ -1,5 +1,5 @@
-FROM ubuntu
+FROM python:3.6
 
-RUN apt-get update && apt-get install -y git python3
+RUN pip3 install psycopg2-binary
 COPY . /iqass
 CMD ["python3", "/iqass/iqass.py"]
