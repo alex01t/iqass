@@ -24,7 +24,7 @@ def main():
         s += "<td>{:%Y-%m-%d %H:%M}</td>".format(ts + timedelta(hours=3))
         s += "<td>{0}</td>".format(event)
         s += "<td><a href=http://hh.ru/employer/{0}>{1}</a></td>".format(eid, ename)
-        s += "<td>{:%Y-%m-%d %H:%M}</td>".format(published_at + timedelta(hours=3))
+        s += "<td>{:%Y-%m-%d %H:%M}</td>".format(published_at)
         s += "<td><a href=https://hh.ru/vacancy/{0}>{1}</a></td>".format(id, name)
         s += "</tr>\n"
 
