@@ -64,7 +64,7 @@ def crawl2(urlf: Callable[[int, int], Url]):
 
 def wget(url):
     import urllib.request, urllib.error, http
-    headers = {'User-Agent': 'api-test-agent',}
+    headers = {'User-Agent': 'MyApp/1.0 (tarasenkoas@gmail.com)',}
     req = urllib.request.Request(url, data=None, headers=headers)
 
     data = b''

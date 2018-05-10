@@ -35,7 +35,7 @@ class EmployerBook:
     @staticmethod
     def get_priority_list() -> List[Employer]:
         def priority(e: Employer) -> bool:
-            return int(e["id"]) in [42, 1876072, 1304, 86622]
+            return int(e["id"]) in [42, 1876072, 1304, 86622, 6769,]
 
         es = list(EmployerBook._dict.values())
         shuffle(es)

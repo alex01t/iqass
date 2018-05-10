@@ -7,7 +7,7 @@ from VacancyBook import VacancyBook
 import logging
 import time
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO)
 
 def main():
 
@@ -28,7 +28,7 @@ def main():
                     "&page=" + str(page) + "&per_page=" + str(per)
 
                 vs = list(fetch.crawl2(vacf))
-                logging.debug("got %s vacancies for employer %s", len(vs), emp_id)
+                logging.info("got %s vacancies for employer %s", len(vs), emp_id)
                 VacancyBook.update(emp_id, vs)
 
             logging.info("done here, sleep()")
