@@ -87,7 +87,8 @@ def get_vacancy_events():
             v.js->>'name' as name
         from vacancy v, employer e
         where e.id = v.eid 
-        order by ts desc limit 1024"""
+        and v.ts > now() - interval '2 days'
+        order by ts desc """
     try:
         c = conn.cursor()
         c.execute(q)
